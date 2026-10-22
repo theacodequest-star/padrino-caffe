@@ -6,7 +6,7 @@ import { Sheet } from '../components/Sheet'
 import { StarInput, Stars } from '../components/Stars'
 import { api, type MenuItem } from '../lib/api'
 import { useI18n } from '../lib/i18n'
-import { isStaff, useAuth } from '../lib/auth'
+import { isManager, isStaff, useAuth } from '../lib/auth'
 import { pick, ratingsWord, rsd, useCart } from '../lib/guest'
 import { useLoad } from '../lib/useLoad'
 
@@ -25,7 +25,7 @@ export function Menu() {
 
   return (
     <Page title={t('menu')}>
-      {!canOrder && <Link to="/admin/menu" className="btn btn-ghost" style={{ marginBottom: 14 }}>{t('editMenu')}</Link>}
+      {isManager(profile?.role) && <Link to="/admin/menu" className="btn btn-ghost" style={{ marginBottom: 14 }}>{t('editMenu')}</Link>}
       <nav className="chips" aria-label={t('menu')}>
         {categories.map(c => <a key={c.id} href={`#cat-${c.id}`} className="chip">{pick(c, 'name', lang)}</a>)}
       </nav>
