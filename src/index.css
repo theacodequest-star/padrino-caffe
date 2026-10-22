@@ -429,8 +429,10 @@ input[type='month'] { min-height: 48px; padding: 8px 12px; border: 1px solid var
 .event-when { margin: 0 0 6px; font-size: 15px; }
 .event p:last-child { margin-bottom: 0; }
 .open-order { margin-bottom: 12px; }
-.tiles-guest { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-@media (max-width: 359px) { .tiles-guest { grid-template-columns: 1fr; } }
+/* Guests have three big buttons: one per row on phones, side by side from tablet width. */
+.tiles-guest { grid-template-columns: 1fr; }
+@media (min-width: 560px) { .tiles-guest { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.tile { overflow-wrap: normal; }
 
 /* ---------- Staff screens ---------- */
 .btn-small { width: auto; min-height: 44px; padding: 6px 14px; font-size: 13px; flex-shrink: 0; }
@@ -553,3 +555,4 @@ input[type='search'], input[type='time'] { min-height: 48px; padding: 8px 12px; 
 .rank-list li { flex-wrap: wrap; }
 .rank-list-name { flex: 1 1 120px; overflow-wrap: normal; }
 .rank-list strong { margin-left: auto; }
+.nowrap { white-space: nowrap; }
