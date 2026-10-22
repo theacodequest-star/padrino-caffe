@@ -36,7 +36,8 @@ export function Cart() {
       clear()
       navigate(`/order/${order.id}`, { replace: true })
     } catch (err) {
-      setError(/banned|warn/i.test((err as Error).message) ? t('cantOrder') : t('error'))
+      const m = (err as Error).message
+      setError(/paused/i.test(m) ? t('orderPaused') : /banned|blocked|warn/i.test(m) ? t('cantOrder') : t('error'))
       setBusy(false)
     }
   }

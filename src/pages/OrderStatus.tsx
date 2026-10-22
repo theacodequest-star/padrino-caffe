@@ -104,6 +104,16 @@ function ReviewForm({ order }: { order: Order }) {
   const [stars, setStars] = useState(0)
   const [comment, setComment] = useState('')
   const [state, setState] = useState<'idle' | 'busy' | 'done' | 'error'>('idle')
+  const [waiter, setWaiter] = useState<string | null>(null)
+
+  useEffect(() => {
+    api.orderWaiter(order.id).then(w => {
+      if (!w) return
+      setWaiter(w.waiter_name)
+      if (w.stars) setStars(w.stars)
+      if (w.comment) setComment(w.comment)
+    }).catch(() => {})
+  }, [order.id])
 
   const rateDrink = async (itemId: string, v: number) => {
     setDrinks(d => ({ ...d, [itemId]: v }))
@@ -126,7 +136,7 @@ function ReviewForm({ order }: { order: Order }) {
           <StarInput value={drinks[l.item_id] ?? 0} onChange={v => rateDrink(l.item_id, v)} label={pick(l, 'name', lang)} />
         </div>
       ))}
-      <h2 className="section-title"><Cz>{t('rateWaiter')}</Cz></h2>
+      <h2 className="section-title"><Cz>{waiter ? t('rateWaiterNamed', { n: waiter }) : t('rateWaiter')}</Cz></h2>
       <form onSubmit={submit}>
         <StarInput value={stars} onChange={setStars} label={t('rateWaiter')} />
         <label className="field">

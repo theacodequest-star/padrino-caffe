@@ -121,6 +121,7 @@ const base = {
     }))
   },
   async setHideFromLeaderboard(hide) { profile.hide_from_leaderboard = hide },
+  async orderWaiter() { return { waiter_name: 'Jelena', stars: null, comment: null } },
   async nicknameTaken(n) { return ['kum đorđe', 'sonny', 'fredo'].includes(n.toLowerCase()) },
   async events() { return events },
 

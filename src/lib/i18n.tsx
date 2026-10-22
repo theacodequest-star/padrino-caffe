@@ -136,6 +136,9 @@ const strings = {
   history: { sr: 'Istorija bodova', en: 'Points history' },
   reason_order: { sr: 'Porudžbina', en: 'Order' },
   reason_reward: { sr: 'Nagrada', en: 'Reward' },
+  reason_correction: { sr: 'Ispravka', en: 'Correction' },
+  rateWaiterNamed: { sr: 'Oceni konobara: {n}', en: 'Rate your waiter: {n}' },
+  orderPaused: { sr: 'Poručivanje je pauzirano za danas. Pozovi konobara.', en: 'Ordering is paused for today. Please ask a waiter.' },
   noHistory: { sr: 'Još nema bodova. Prva kafa donosi prve bodove.', en: 'No points yet. Your first coffee brings the first ones.' },
   pointsShort: { sr: 'bod.', en: 'pts' },
 

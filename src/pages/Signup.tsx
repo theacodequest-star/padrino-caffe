@@ -8,7 +8,7 @@ import { supabase } from '../lib/supabase'
 import { maxBirthYear } from '../lib/auth'
 
 export function Signup() {
-  const { t } = useI18n()
+  const { t, lang } = useI18n()
   const [form, setForm] = useState({ fullName: '', nickname: '', birthYear: '', email: '', password: '' })
   const [nick, setNick] = useState<NickState>('idle')
   const [error, setError] = useState('')
@@ -29,11 +29,11 @@ export function Signup() {
       password: form.password,
       options: {
         emailRedirectTo: `${window.location.origin}/auth/callback`,
-        data: { name: form.fullName.trim(), full_name: form.fullName.trim(), nickname: form.nickname.trim(), birth_year: year },
+        data: { name: form.fullName.trim(), nickname: form.nickname.trim(), birth_year: year, language: lang },
       },
     })
     setBusy(false)
-    if (error) setError(/banned/i.test(error.message) ? t('bannedEmail') : /nickname/i.test(error.message) ? t('nicknameTaken') : t('error'))
+    if (error) setError(/banned/i.test(error.message) ? t('bannedEmail') : /nickname/i.test(error.message) ? t('nicknameTaken') : /13/.test(error.message) ? t('tooYoung') : t('error'))
     else setDone(true)
   }
 

@@ -103,8 +103,19 @@ const toItem = (r: Row, ratings: Map<string, { average: number; count: number }>
   avg_rating: ratings.get(String(r.id)) ? Number(ratings.get(String(r.id))!.average) : null,
   rating_count: ratings.get(String(r.id))?.count ?? 0,
 })
+// The database calls a delivered order 'done'. An unscanned order counts as expired after
+// 15 minutes even before the database gets round to marking it.
+const EXPIRY_MS = 15 * 60 * 1000
+const fromDbStatus = (r: Row): OrderStatus =>
+  r.status === 'done' ? 'delivered'
+  : r.status === 'waiting' && Date.now() - new Date(r.created_at).getTime() > EXPIRY_MS ? 'expired'
+  : r.status
+const toDbStatus = (s: OrderStatus) => (s === 'delivered' ? 'done' : s)
+const fromDbRole = (r: string): Role => (r === 'customer' ? 'guest' : r) as Role
+const toDbRole = (r: Role) => (r === 'guest' ? 'customer' : r)
+
 const toOrder = (r: Row): StaffOrder => ({
-  id: String(r.id), code: r.code, table_number: r.table_number, note: r.note || null, status: r.status,
+  id: String(r.id), code: r.code, table_number: r.table_number, note: r.note || null, status: fromDbStatus(r),
   total: r.total_rsd, points: pointsFor(r.total_rsd), created_at: r.created_at, waiter_id: r.delivered_by ?? null,
   confirmed_at: r.confirmed_at ?? null, guest_nickname: null,
   lines: ((r.order_items ?? []) as Row[]).map(l => ({
@@ -123,11 +134,14 @@ const toEvent = (r: Row): EventItem => {
 }
 const ORDER_SELECT = '*, order_items(*)'
 
-// owner_stats returns one JSON object; see the field names it uses in the database function.
 const toStats = (j: Row): Stats => ({
-  revenue: j.revenue ?? 0, orders: j.orders ?? 0, avg_bill: j.avg_bill ?? 0, guests: j.guests ?? 0,
-  new_members: j.new_members ?? 0, points_given: j.points_given ?? 0, rewards_used: j.rewards_used ?? 0, rejected: j.rejected ?? 0,
-  by_day: j.by_day ?? [], by_hour: j.by_hour ?? [], top_selling: j.top_selling ?? [], top_rated: j.top_rated ?? [],
+  revenue: j.revenue, orders: j.orders, avg_bill: j.orders ? Math.round(j.revenue / j.orders) : 0, guests: j.guests,
+  new_members: j.new_members, points_given: j.points_given, rewards_used: j.rewards_used, rejected: j.rejected,
+  by_day: ((j.by_day ?? []) as Row[]).map(d => ({ day: d.day, revenue: d.revenue })),
+  // Hours with no orders are left out so the chart covers opening hours only.
+  by_hour: ((j.by_hour ?? []) as Row[]).filter(h => h.orders > 0).map(h => ({ hour: h.hour, orders: h.orders })),
+  top_selling: ((j.top_items ?? []) as Row[]).map(i => ({ item_id: i.name_sr, name_sr: i.name_sr, name_en: i.name_en, qty: i.quantity, revenue: i.revenue })),
+  top_rated: ((j.top_rated ?? []) as Row[]).map(i => ({ item_id: i.name_sr, name_sr: i.name_sr, name_en: i.name_en, avg: Number(i.average), count: i.count })),
 })
 
 async function myId() {
@@ -154,7 +168,7 @@ const live = {
   async myRatedItemIds(): Promise<{ allowed: string[]; mine: Record<string, number> }> {
     const uid = await myId()
     const [had, mine] = await Promise.all([
-      supabase.from('orders').select('order_items(menu_item_id)').eq('customer_id', uid).eq('status', 'delivered'),
+      supabase.from('orders').select('order_items(menu_item_id)').eq('customer_id', uid).eq('status', 'done'),
       supabase.from('item_ratings').select('menu_item_id, stars').eq('customer_id', uid),
     ])
     const allowed = new Set<string>()
@@ -178,7 +192,7 @@ const live = {
   },
   async myOpenOrder(): Promise<Order | null> {
     const r = await supabase.from('orders').select(ORDER_SELECT).eq('customer_id', await myId())
-      .in('status', OPEN_STATUSES).order('created_at', { ascending: false }).limit(1).maybeSingle()
+      .in('status', OPEN_STATUSES.map(toDbStatus)).order('created_at', { ascending: false }).limit(1).maybeSingle()
     const row = check<Row | null>(r)
     return row ? toOrder(row) : null
   },
@@ -201,35 +215,23 @@ const live = {
     const r = await supabase.from('point_entries').select('*').eq('customer_id', await myId()).order('created_at', { ascending: false }).limit(50)
     return check<Row[]>(r).map(e => ({ id: String(e.id), points: e.points, reason: e.reason, created_at: e.created_at, reward_name_sr: e.reward_name_sr, reward_name_en: e.reward_name_en }))
   },
-  // Worked out from the guest's own orders, points and ratings, which they are allowed to read.
   async myStats(): Promise<GuestStats> {
     const uid = await myId()
-    const [orders, points, ratings, board] = await Promise.all([
-      supabase.from('orders').select('created_at, total_rsd, order_items(menu_item_id)').eq('customer_id', uid).eq('status', 'delivered'),
-      supabase.from('point_entries').select('points, reward_id').eq('customer_id', uid),
-      supabase.from('item_ratings').select('menu_item_id', { count: 'exact', head: true }).eq('customer_id', uid),
-      supabase.rpc('leaderboard', { p_month: null }),
+    const [standing, balance] = await Promise.all([
+      supabase.rpc('my_family_standing'),
+      supabase.rpc('points_balance', { p_customer_id: uid }),
     ])
-    const delivered = check<Row[]>(orders)
-    const entries = check<Row[]>(points)
-    const dates = delivered.map(o => new Date(o.created_at))
-    const tried = new Set<string>()
-    for (const o of delivered) for (const l of o.order_items as Row[]) tried.add(String(l.menu_item_id))
-    const place = check<Row[]>(board).findIndex(r => r.is_me)
+    const j = check<Row>(standing)
     return {
-      balance: entries.reduce((s, e) => s + e.points, 0),
-      lifetime: entries.filter(e => e.points > 0).reduce((s, e) => s + e.points, 0),
-      delivered_orders: delivered.length,
-      rewards_used: entries.filter(e => e.reward_id != null).length,
-      rated_items: ratings.count ?? 0,
-      tried_items: tried.size,
-      early_order: dates.some(d => d.getHours() < 9),
-      late_order: dates.some(d => d.getHours() >= 22),
-      big_order: delivered.some(o => o.total_rsd >= 2000),
-      weekend_orders: dates.filter(d => d.getDay() === 0 || d.getDay() === 6).length,
-      distinct_months: new Set(dates.map(d => `${d.getFullYear()}-${d.getMonth()}`)).size,
-      all_time_place: place >= 0 ? place + 1 : null,
+      balance: check<number>(balance), lifetime: j.lifetime_points, delivered_orders: j.done_orders,
+      rewards_used: j.rewards_used, rated_items: j.ratings_given, tried_items: j.distinct_items,
+      early_order: j.early_orders > 0, late_order: j.late_orders > 0, big_order: j.biggest_order >= 2000,
+      weekend_orders: j.weekend_orders, distinct_months: j.active_months, all_time_place: j.place ?? null,
     }
+  },
+  // The waiter who served a delivered order, and the guest's review of them if there is one.
+  async orderWaiter(orderId: string): Promise<{ waiter_name: string; stars: number | null; comment: string | null } | null> {
+    return check<Row | null>(await supabase.rpc('order_waiter', { p_order_id: num(orderId) })) as never
   },
   async leaderboard(month: string | null): Promise<LeaderRow[]> {
     const r = await supabase.rpc('leaderboard', { p_month: month ? `${month}-01` : null })
@@ -253,11 +255,11 @@ const live = {
   // Moves new → preparing → ready → delivered; the database records who delivered it.
   async advanceOrder(o: Order) {
     const next = NEXT_STATUS[o.status]
-    if (next) check(await supabase.rpc('set_order_status', { p_order_id: num(o.id), p_status: next }))
+    if (next) check(await supabase.rpc('set_order_status', { p_order_id: num(o.id), p_status: toDbStatus(next) }))
   },
   async ordersForDay(day: string): Promise<StaffOrder[]> {
     const r = await supabase.from('orders').select(ORDER_SELECT).eq('order_day', day)
-      .not('status', 'in', `(${HIDDEN_FROM_STAFF.join(',')})`).order('created_at', { ascending: false })
+      .not('status', 'in', `(${HIDDEN_FROM_STAFF.map(toDbStatus).join(',')})`).order('created_at', { ascending: false })
     return check<Row[]>(r).map(toOrder)
   },
   watchOrders(onChange: () => void) {
@@ -302,19 +304,20 @@ const live = {
 
   // ---- Owner and admins ----
   async stats(from: string, to: string): Promise<Stats> {
+    // owner_stats counts p_days back from p_end (today when left out), in Belgrade time.
     const days = Math.round((new Date(to).getTime() - new Date(from).getTime()) / 864e5) + 1
-    return toStats(check<Row>(await supabase.rpc('owner_stats', { p_days: days })))
+    return toStats(check<Row>(await supabase.rpc('owner_stats', { p_days: days, p_end: to })))
   },
   async people(query: string, staffOnly: boolean): Promise<Person[]> {
     const rows = check<Row[]>(await supabase.rpc('list_members', { p_search: query }))
     return rows
       .map(r => ({
-        id: r.id, full_name: r.name, nickname: r.nickname, email: r.email, role: r.role, created_at: r.created_at,
+        id: r.id, full_name: r.name, nickname: r.nickname, email: r.email, role: fromDbRole(r.role), created_at: r.created_at,
         warned_until: r.banned_at ? null : r.nickname_deadline, banned: !!r.banned_at,
       }))
       .filter(p => !staffOnly || p.role !== 'guest')
   },
-  async setRole(userId: string, role: Role) { check(await supabase.rpc('set_member_role', { p_user_id: userId, p_role: role })) },
+  async setRole(userId: string, role: Role) { check(await supabase.rpc('set_member_role', { p_user_id: userId, p_role: toDbRole(role) })) },
   async warn(userId: string) { check(await supabase.rpc('warn_nickname', { p_user_id: userId })) },
   async removeWarning(userId: string) { check(await supabase.rpc('lift_moderation', { p_user_id: userId })) },
   async ban(userId: string) { check(await supabase.rpc('ban_member', { p_user_id: userId })) },

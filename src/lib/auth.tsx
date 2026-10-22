@@ -38,7 +38,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (!s) { setProfile(null); return }
     const { data } = await supabase.from('profiles').select('*').eq('id', s.user.id).maybeSingle()
     setProfile(data ? {
-      id: data.id, full_name: data.name, nickname: data.nickname, birth_year: data.birth_year, role: data.role,
+      id: data.id, full_name: data.name, nickname: data.nickname, birth_year: data.birth_year, role: data.role === 'customer' ? 'guest' : data.role,
       language: data.language, hide_from_leaderboard: data.hide_from_leaderboard,
       warned_until: data.banned_at ? null : data.nickname_deadline, banned: !!data.banned_at,
     } : null)
