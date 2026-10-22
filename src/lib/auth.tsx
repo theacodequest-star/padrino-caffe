@@ -79,8 +79,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const check = async () => {
       if (document.visibilityState !== 'visible') return
       const { error } = await supabase.auth.getUser()
-      // Only a definite "no such session" counts; being offline must not log anyone out.
-      if (error && (error.status === 401 || error.status === 403)) {
+      // Only the server saying this session no longer exists counts. Being offline, a slow network or an
+      // expired token that is still being refreshed must never log anyone out.
+      if (error && ENDED.has(error.code ?? '')) {
         save(KICKED_KEY, '1')
         await supabase.auth.signOut({ scope: 'local' })
       }
@@ -105,6 +106,7 @@ export async function nicknameAvailable(nickname: string): Promise<boolean> {
 }
 
 const KICKED_KEY = 'padrino.kicked'
+const ENDED = new Set(['session_not_found', 'refresh_token_not_found', 'user_not_found'])
 
 // Call right after a fresh login: ends the account's sessions on every other device.
 export async function endOtherSessions() {

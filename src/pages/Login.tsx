@@ -5,6 +5,7 @@ import { Field } from '../components/Field'
 import { useI18n } from '../lib/i18n'
 import { supabase } from '../lib/supabase'
 import { endOtherSessions } from '../lib/auth'
+import { InstallButton } from '../components/InstallButton'
 
 export function Login() {
   const { t } = useI18n()
@@ -33,6 +34,7 @@ export function Login() {
         <button className="btn" disabled={busy}>{t('login')}</button>
         <p className="center"><Link to="/forgot-password">{t('forgotLink')}</Link></p>
         <p className="center">{t('noAccount')} <Link to="/signup">{t('join')}</Link></p>
+        <div className="center"><InstallButton className="link-btn" /></div>
       </form>
     </Page>
   )
