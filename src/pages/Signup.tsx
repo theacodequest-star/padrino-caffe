@@ -29,7 +29,7 @@ export function Signup() {
       password: form.password,
       options: {
         emailRedirectTo: `${window.location.origin}/auth/callback`,
-        data: { full_name: form.fullName.trim(), nickname: form.nickname.trim(), birth_year: year },
+        data: { name: form.fullName.trim(), full_name: form.fullName.trim(), nickname: form.nickname.trim(), birth_year: year },
       },
     })
     setBusy(false)

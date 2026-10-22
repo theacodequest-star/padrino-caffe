@@ -5,11 +5,10 @@ import { nicknameAvailable } from '../lib/auth'
 
 export type NickState = 'idle' | 'checking' | 'free' | 'taken'
 
-export function NicknameField({ value, onChange, onState, selfId }: {
+export function NicknameField({ value, onChange, onState }: {
   value: string
   onChange: (v: string) => void
   onState: (s: NickState) => void
-  selfId?: string
 }) {
   const { t } = useI18n()
   const [state, setState] = useState<NickState>('idle')
@@ -19,11 +18,11 @@ export function NicknameField({ value, onChange, onState, selfId }: {
     if (nick.length < 2) { setState('idle'); onState('idle'); return }
     setState('checking'); onState('checking')
     const timer = setTimeout(async () => {
-      const s = (await nicknameAvailable(nick, selfId)) ? 'free' : 'taken'
+      const s = (await nicknameAvailable(nick)) ? 'free' : 'taken'
       setState(s); onState(s)
     }, 350)
     return () => clearTimeout(timer)
-  }, [value, selfId, onState])
+  }, [value, onState])
 
   return (
     <Field

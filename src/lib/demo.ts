@@ -116,11 +116,12 @@ const base = {
   },
   async leaderboard(month) {
     const base = [['Kum Đorđe', 182], ['Sonny', 151], ['Konsiljere Tom', 120], ['Fredo', 77], ['Don Marko', 44], ['Kej', 38], ['Luka B.', 21]] as const
-    return base.map(([nickname, points], i) => ({
-      user_id: nickname === 'Don Marko' ? 'demo-user' : `u${i}`, nickname, points: month ? Math.round(points / 4) : points,
+    return base.map(([nickname, points]) => ({
+      nickname, points: month ? Math.round(points / 4) : points, is_me: nickname === 'Don Marko',
     }))
   },
   async setHideFromLeaderboard(hide) { profile.hide_from_leaderboard = hide },
+  async nicknameTaken(n) { return ['kum đorđe', 'sonny', 'fredo'].includes(n.toLowerCase()) },
   async events() { return events },
 
   async orderByCode(code) {
@@ -130,8 +131,8 @@ const base = {
   },
   async confirmOrder() { await sleep() },
   async rejectOrder() { await sleep() },
-  async advanceOrder(id) {
-    const o = staffOrders.find(x => x.id === id)
+  async advanceOrder(order) {
+    const o = staffOrders.find(x => x.id === order.id)
     const next: Partial<Record<OrderStatus, OrderStatus>> = { new: 'preparing', preparing: 'ready', ready: 'delivered' }
     if (o && next[o.status]) o.status = next[o.status]!
   },
@@ -141,7 +142,7 @@ const base = {
     await sleep()
     return { user_id: userId, nickname: 'Don Marko', full_name: 'Marko Petrović', balance: 24, blocked: false }
   },
-  async redeemReward() { await sleep() },
+  async redeemReward() { await sleep(); return 4 },
   async saveCategory(c) {
     if (c.id) Object.assign(categories.find(x => x.id === c.id)!, c)
     else categories.push({ id: `c${Date.now()}`, name_sr: '', name_en: '', sort_order: categories.length + 1, ...c })

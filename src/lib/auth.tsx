@@ -2,10 +2,11 @@ import { createContext, useCallback, useContext, useEffect, useState, type React
 import type { Session } from '@supabase/supabase-js'
 import { supabase } from './supabase'
 import { demo } from './demo'
+import { api } from './api'
 
 export type Role = 'guest' | 'waiter' | 'admin' | 'owner'
 
-// Column names follow the spec; confirm against the existing migrations.
+// The app's view of a profile row (name → full_name, nickname_deadline → warned_until, banned_at → banned).
 export type Profile = {
   id: string
   full_name: string | null
@@ -36,7 +37,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (demo.on) { setProfile({ ...demo.profile }); return }
     if (!s) { setProfile(null); return }
     const { data } = await supabase.from('profiles').select('*').eq('id', s.user.id).maybeSingle()
-    setProfile((data as Profile) ?? null)
+    setProfile(data ? {
+      id: data.id, full_name: data.name, nickname: data.nickname, birth_year: data.birth_year, role: data.role,
+      language: data.language, hide_from_leaderboard: data.hide_from_leaderboard,
+      warned_until: data.banned_at ? null : data.nickname_deadline, banned: !!data.banned_at,
+    } : null)
   }, [])
 
   useEffect(() => {
@@ -68,10 +73,9 @@ export const useAuth = () => useContext(AuthContext)
 export const isStaff = (r?: Role) => r === 'waiter' || r === 'admin' || r === 'owner'
 export const isManager = (r?: Role) => r === 'admin' || r === 'owner'
 
-export async function nicknameAvailable(nickname: string, selfId?: string): Promise<boolean> {
-  const { data, error } = await supabase.from('profiles').select('id').ilike('nickname', nickname.replace(/[%_\\]/g, '\\$&')).limit(1)
-  if (error) return true
-  return !data?.length || data[0].id === selfId
+// Nicknames are unique ignoring case; the database answers without exposing other profiles.
+export async function nicknameAvailable(nickname: string): Promise<boolean> {
+  try { return !(await api.nicknameTaken(nickname)) } catch { return true }
 }
 
 export function signInWithGoogle() {

@@ -48,7 +48,7 @@ export function Warned() {
         <p className="alert-risk">{t('warnedRisk')}</p>
       </div>
       <form onSubmit={submit}>
-        <NicknameField value={nickname} onChange={setNickname} onState={setNick} selfId={undefined} />
+        <NicknameField value={nickname} onChange={setNickname} onState={setNick} />
         {error && <p className="form-error">{error}</p>}
         <button className="btn btn-big" disabled={busy || nick !== 'free'}>{t('changeNick')}</button>
       </form>

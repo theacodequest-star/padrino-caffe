@@ -23,7 +23,7 @@ export function CompleteProfile() {
     setBusy(true); setError('')
     const fullName = session.user.user_metadata?.full_name ?? session.user.user_metadata?.name ?? null
     const { error } = await supabase.from('profiles')
-      .update({ nickname: nickname.trim(), birth_year: Number(birthYear), ...(fullName ? { full_name: fullName } : {}) })
+      .update({ nickname: nickname.trim(), birth_year: Number(birthYear), ...(fullName ? { name: fullName } : {}) })
       .eq('id', session.user.id)
     setBusy(false)
     if (error) setError(/duplicate|unique/i.test(error.message) ? t('nicknameTaken') : t('error'))
@@ -34,7 +34,7 @@ export function CompleteProfile() {
     <Page title={t('almostThere')} back={false}>
       <p className="center">{t('almostThereText')}</p>
       <form onSubmit={submit}>
-        <NicknameField value={nickname} onChange={setNickname} onState={setNick} selfId={session?.user.id} />
+        <NicknameField value={nickname} onChange={setNickname} onState={setNick} />
         <Field
           label={t('birthYear')} name="birthYear" required inputMode="numeric" pattern="\d{4}" maxLength={4}
           value={birthYear} onChange={e => setBirthYear(e.target.value.replace(/\D/g, ''))}

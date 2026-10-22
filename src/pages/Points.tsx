@@ -87,7 +87,7 @@ export function Points() {
         <ul className="list">
           {history.map(h => (
             <li key={h.id} className="list-row">
-              <span>{t(`reason_${h.reason}` as StringKey) || h.reason}<br /><span className="muted">{dateFmt.format(new Date(h.created_at))}</span></span>
+              <span>{(lang === 'en' ? h.reward_name_en : h.reward_name_sr) || t(`reason_${h.reason}` as StringKey) || h.reason}<br /><span className="muted">{dateFmt.format(new Date(h.created_at))}</span></span>
               <strong className={h.points > 0 ? 'plus' : 'minus'}>{h.points > 0 ? `+${h.points}` : h.points}</strong>
             </li>
           ))}

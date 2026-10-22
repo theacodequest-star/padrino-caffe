@@ -27,7 +27,7 @@ export function Orders() {
   const shown = list.filter(o => matches(o, filter))
 
   const advance = async (o: StaffOrder) => {
-    try { await api.advanceOrder(o.id); orders.reload() } catch { orders.reload() }
+    try { await api.advanceOrder(o) } finally { orders.reload() }
   }
 
   return (

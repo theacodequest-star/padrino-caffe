@@ -34,7 +34,7 @@ export function Scan() {
     if (!order) return
     setBusy(true)
     try {
-      await (confirm ? api.confirmOrder(order.id) : api.rejectOrder(order.id))
+      await (confirm ? api.confirmOrder(order) : api.rejectOrder(order))
       setMsg({ text: confirm ? t('confirmed') : t('rejected'), kind: 'ok' })
       setOrder(null); setCode('')
     } catch { setMsg({ text: t('error'), kind: 'error' }) }

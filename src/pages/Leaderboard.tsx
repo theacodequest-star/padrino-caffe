@@ -39,10 +39,10 @@ export function Leaderboard() {
       {!rows.data ? <Loading error={rows.error} /> : rows.data.length === 0 ? <p className="muted center">{t('nobodyYet')}</p> : (
         <ol className="leader">
           {rows.data.map((r, i) => (
-            <li key={r.user_id} className={r.user_id === profile?.id ? 'me' : ''}>
+            <li key={`${i}-${r.nickname}`} className={r.is_me ? 'me' : ''}>
               <span className="leader-place">{i + 1}</span>
               <span className="leader-name">
-                {r.nickname}{r.user_id === profile?.id && <span className="muted"> ({t('you')})</span>}
+                {r.nickname}{r.is_me && <span className="muted"> ({t('you')})</span>}
                 {mode === 'all' && i < 3 && <span className="leader-title">{TITLES[i]}</span>}
               </span>
               <span className="leader-pts">{r.points} <span className="muted">{pointsWord(r.points, lang)}</span></span>
