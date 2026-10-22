@@ -5,3 +5,7 @@ export function load(key: string): string | null {
 export function save(key: string, value: string) {
   try { localStorage.setItem(key, value) } catch { /* private mode */ }
 }
+
+export function remove(key: string) {
+  try { localStorage.removeItem(key) } catch { /* private mode */ }
+}

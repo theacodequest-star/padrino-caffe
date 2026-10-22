@@ -9,6 +9,8 @@ import { useI18n } from '../../lib/i18n'
 import { pick } from '../../lib/guest'
 import { useLoad } from '../../lib/useLoad'
 
+// Event emails go to people who used the app or ordered within this many days.
+const ACTIVE_DAYS = 60
 const today = () => new Date().toISOString().slice(0, 10)
 const srDate = (d: string) => { const [y, m, dd] = d.split('-'); return `${dd}.${m}.${y}` }
 
@@ -25,10 +27,16 @@ export function EventsEdit() {
   }
 
   const notify = async (e: EventItem) => {
-    if (!(await dialog({ message: t('notifyConfirm', { n: pick(e, 'title', lang) }), confirm: true, okLabel: t('notifyGuests') }))) return
     setSending(e.id)
-    try { dialog({ message: t('notified', { n: await api.notifyEvent(e.id) }) }) } catch { dialog({ message: t('error') }) }
+    try {
+      const audience = await api.eventAudience(ACTIVE_DAYS)
+      if (await dialog({ message: t('emailConfirm', { n: pick(e, 'title', lang), c: audience, d: ACTIVE_DAYS }), confirm: true, okLabel: t('emailGuests') }))
+        dialog({ message: t('emailQueued', { n: await api.notifyEvent(e.id, ACTIVE_DAYS) }) })
+    } catch (err) {
+      dialog({ message: /ALREADY_ANNOUNCED/.test((err as Error).message) ? t('alreadyAnnounced') : t('error') })
+    }
     setSending(null)
+    events.reload()
   }
 
   return (
@@ -47,9 +55,10 @@ export function EventsEdit() {
                 <p className="muted event-when">{srDate(e.date)} · {e.time.slice(0, 5)}</p>
                 {pick(e, 'description', lang) && <p>{pick(e, 'description', lang)}</p>}
                 <div className="edit-row-actions">
-                  {!past && (
-                    <button className="btn btn-small" disabled={sending === e.id} onClick={() => notify(e)}>🔔 {t('notifyGuests')}</button>
+                  {!past && !e.announced_at && (
+                    <button className="btn btn-small" disabled={sending === e.id} onClick={() => notify(e)}>✉ {t('emailGuests')}</button>
                   )}
+                  {e.announced_at && <span className="tag">{t('emailSentOn', { d: srDate(e.announced_at.slice(0, 10)) })}</span>}
                   <button className="link-btn" onClick={() => setEditing(e)}>{t('edit')}</button>
                   <button className="link-btn danger" onClick={async () => {
                     if (await dialog({ message: t('deleteEventConfirm', { n: pick(e, 'title', lang) }), confirm: true, danger: true, okLabel: t('delete') }))

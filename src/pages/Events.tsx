@@ -1,13 +1,23 @@
+import { useState } from 'react'
 import { Page } from '../components/Page'
 import { Loading } from '../components/Loading'
 import { api } from '../lib/api'
 import { useI18n } from '../lib/i18n'
 import { pick } from '../lib/guest'
 import { useLoad } from '../lib/useLoad'
+import { useAuth } from '../lib/auth'
 
 export function Events() {
   const { t, lang } = useI18n()
   const events = useLoad(() => api.events())
+  const { profile, refreshProfile } = useAuth()
+  const [busy, setBusy] = useState(false)
+  const toggleEmails = async () => {
+    if (!profile) return
+    setBusy(true)
+    try { await api.setEventEmails(!profile.event_emails); await refreshProfile() } catch { /* the switch stays as it was */ }
+    setBusy(false)
+  }
 
   return (
     <Page title={t('events')}>
@@ -32,6 +42,12 @@ export function Events() {
             )
           })}
         </ul>
+      )}
+      {profile && (
+        <label className="toggle">
+          <input type="checkbox" checked={profile.event_emails} disabled={busy} onChange={toggleEmails} />
+          <span>{t('eventEmails')}</span>
+        </label>
       )}
     </Page>
   )

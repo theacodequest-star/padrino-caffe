@@ -14,7 +14,7 @@ const role = (['guest', 'waiter', 'admin', 'owner'].includes(stored ?? '') ? sto
 
 const profile: Profile = {
   id: 'demo-user', full_name: 'Marko Petrović', nickname: 'Don Marko', birth_year: 1994, role,
-  language: 'sr', hide_from_leaderboard: false, warned_until: null, banned: false,
+  language: 'sr', hide_from_leaderboard: false, event_emails: true, warned_until: null, banned: false,
 }
 
 const categories: Category[] = [
@@ -124,6 +124,7 @@ const base = {
   async orderWaiter() { return { waiter_name: 'Jelena', stars: null, comment: null } },
   async nicknameTaken(n) { return ['kum đorđe', 'sonny', 'fredo'].includes(n.toLowerCase()) },
   async events() { return events },
+  async setEventEmails(on: boolean) { profile.event_emails = on },
 
   async orderByCode(code) {
     await sleep()
@@ -227,7 +228,13 @@ const admin = {
     else events.push({ id: `e${Date.now()}`, title_sr: '', title_en: '', description_sr: null, description_en: null, date: '', time: '', ...e })
   },
   async deleteEvent(id: string) { events.splice(events.findIndex(e => e.id === id), 1) },
-  async notifyEvent() { await sleep(600); return 37 },
+  async notifyEvent(id: string) {
+    await sleep(600)
+    const e = events.find(x => x.id === id)
+    if (e) e.announced_at = new Date().toISOString()
+    return 37
+  },
+  async eventAudience(days: number) { return days >= 60 ? 37 : 24 },
   async changeNickname(n: string) { profile.nickname = n; profile.warned_until = null },
 } satisfies Partial<Api>
 

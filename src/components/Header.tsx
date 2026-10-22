@@ -9,7 +9,7 @@ export function Header() {
   const { lang, setLang, t } = useI18n()
   const { theme, toggle } = useTheme()
   const { session } = useAuth()
-  // Notifications are sent in the language saved on the profile.
+  // Emails are sent in the language saved on the profile.
   const switchLang = () => {
     const next = lang === 'sr' ? 'en' : 'sr'
     setLang(next)
