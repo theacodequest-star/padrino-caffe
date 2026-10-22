@@ -115,12 +115,5 @@ export async function endOtherSessions() {
 export const wasSignedOutElsewhere = () => load(KICKED_KEY) === '1'
 export const clearSignedOutElsewhere = () => remove(KICKED_KEY)
 
-export function signInWithGoogle() {
-  return supabase.auth.signInWithOAuth({
-    provider: 'google',
-    options: { redirectTo: `${window.location.origin}/auth/callback` },
-  })
-}
-
 export const MIN_AGE = 13
 export const maxBirthYear = () => new Date().getFullYear() - MIN_AGE

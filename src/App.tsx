@@ -6,6 +6,7 @@ import { Login } from './pages/Login'
 import { Signup } from './pages/Signup'
 import { AuthCallback } from './pages/AuthCallback'
 import { CompleteProfile } from './pages/CompleteProfile'
+import { ForgotPassword, NewPassword } from './pages/Password'
 import { Home } from './pages/Home'
 import { NotFound } from './pages/Placeholder'
 import { Menu } from './pages/Menu'
@@ -39,6 +40,7 @@ function AppRoutes() {
       <Route path="/" element={<Welcome />} />
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<Signup />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   )
@@ -52,6 +54,7 @@ function AppRoutes() {
       <Route path="/" element={<Home />} />
       <Route path="/login" element={<Navigate to="/" replace />} />
       <Route path="/signup" element={<Navigate to="/" replace />} />
+      <Route path="/new-password" element={<NewPassword />} />
       <Route path="/menu" element={<Menu />} />
       <Route path="/order/new" element={<Cart />} />
       <Route path="/order/:id" element={<OrderStatus />} />

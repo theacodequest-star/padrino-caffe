@@ -6,7 +6,7 @@ import { useI18n } from '../lib/i18n'
 import { supabase } from '../lib/supabase'
 import { maxBirthYear, useAuth } from '../lib/auth'
 
-// "Još samo malo": a new Google user picks a nickname and year of birth before anything else.
+// "Još samo malo": an account without a nickname or year of birth (from the old app's Google sign-in) fills them in first.
 export function CompleteProfile() {
   const { t } = useI18n()
   const { session, refreshProfile } = useAuth()

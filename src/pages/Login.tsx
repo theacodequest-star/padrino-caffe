@@ -4,7 +4,7 @@ import { Page } from '../components/Page'
 import { Field } from '../components/Field'
 import { useI18n } from '../lib/i18n'
 import { supabase } from '../lib/supabase'
-import { endOtherSessions, signInWithGoogle } from '../lib/auth'
+import { endOtherSessions } from '../lib/auth'
 
 export function Login() {
   const { t } = useI18n()
@@ -31,8 +31,7 @@ export function Login() {
         <Field label={t('password')} name="password" type="password" required autoComplete="current-password" value={password} onChange={e => setPassword(e.target.value)} />
         {error && <p className="form-error">{error}</p>}
         <button className="btn" disabled={busy}>{t('login')}</button>
-        <p className="or">—</p>
-        <button type="button" className="btn btn-ghost" onClick={() => signInWithGoogle()}>{t('google')}</button>
+        <p className="center"><Link to="/forgot-password">{t('forgotLink')}</Link></p>
         <p className="center">{t('noAccount')} <Link to="/signup">{t('join')}</Link></p>
       </form>
     </Page>

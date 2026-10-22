@@ -3,8 +3,8 @@ import { Link, useNavigate } from 'react-router-dom'
 import { endOtherSessions, useAuth } from '../lib/auth'
 import { useI18n } from '../lib/i18n'
 
-// Google and email-confirmation links land here; the Supabase client finishes the sign-in from the URL.
-// If Google or Supabase refused, the reason comes back in the address, and we show it instead of waiting.
+// Email confirmation and password-reset links land here; the Supabase client finishes the sign-in from the URL.
+// If Supabase refused (an expired link, say), the reason comes back in the address, and we show it instead of waiting.
 export function AuthCallback() {
   const { session, loading } = useAuth()
   const { t } = useI18n()
@@ -18,7 +18,8 @@ export function AuthCallback() {
     if (loading || failure) return
     if (session) {
       // A new login takes over the account: other devices get signed out.
-      endOtherSessions().finally(() => navigate('/', { replace: true }))
+      const next = new URLSearchParams(window.location.search).get('next') === 'new-password' ? '/new-password' : '/'
+      endOtherSessions().finally(() => navigate(next, { replace: true }))
       return
     }
     const timer = setTimeout(() => navigate('/login', { replace: true }), 6000)
