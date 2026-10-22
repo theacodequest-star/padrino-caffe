@@ -362,6 +362,18 @@ const live = {
   async setEventEmails(on: boolean) {
     check(await supabase.from('profiles').update({ event_emails: on }).eq('id', await myId()))
   },
+  // Owner account only: how much test activity there is, and deleting all of it.
+  async testDataCounts() { return check<TestCounts>(await supabase.rpc('test_data_counts')) },
+  async clearTestData() { return check<TestCounts>(await supabase.rpc('clear_test_data')) },
+  // Calls onNew for each order a waiter confirms from now on, with who confirmed it.
+  watchNewOrders(onNew: (orderId: string, confirmedBy: string | null) => void) {
+    const ch = supabase.channel('order-alerts')
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'orders', filter: 'status=eq.new' },
+        p => onNew(String((p.new as Row).id), (p.new as Row).confirmed_by ?? null))
+      .subscribe()
+    return () => { supabase.removeChannel(ch) }
+  },
+
   // Only allowed while the account has a nickname warning.
   async changeNickname(nickname: string) {
     check(await supabase.from('profiles').update({ nickname }).eq('id', await myId()))
@@ -371,6 +383,8 @@ const live = {
     return check<Row[]>(await supabase.from('events').select('*').gte('starts_at', new Date().toISOString()).order('starts_at')).map(toEvent)
   },
 }
+
+export type TestCounts = { orders: number; points: number; ratings: number; reviews: number }
 
 export type Api = typeof live
 export const api: Api = demo.on ? demo.api : live

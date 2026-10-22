@@ -5,6 +5,8 @@ import { api } from '../../lib/api'
 import { useI18n, type StringKey } from '../../lib/i18n'
 import { pick, rsd } from '../../lib/guest'
 import { useLoad } from '../../lib/useLoad'
+import { useAuth } from '../../lib/auth'
+import { useDialog } from '../../components/Dialog'
 
 type Period = 'today' | '7' | '30' | '90' | 'day'
 const PERIODS: Period[] = ['today', '7', '30', '90', 'day']
@@ -97,6 +99,7 @@ export function Stats() {
           )}
         </>
       )}
+      <ClearTestData onCleared={stats.reload} />
     </Page>
   )
 }
@@ -157,5 +160,38 @@ function BarChart({ title, note, data, highlight }: { title: string; note?: stri
       )}
       <button className="link-btn" onClick={() => setTable(v => !v)}>{table ? title : t('showTable')}</button>
     </figure>
+  )
+}
+
+// Only the owner account sees this. Two confirmations, because deleted data can't come back.
+function ClearTestData({ onCleared }: { onCleared: () => void }) {
+  const { t } = useI18n()
+  const { profile } = useAuth()
+  const dialog = useDialog()
+  const [busy, setBusy] = useState(false)
+  if (profile?.role !== 'owner') return null
+
+  const run = async () => {
+    setBusy(true)
+    try {
+      const c = await api.testDataCounts()
+      if (!c.orders && !c.points && !c.ratings && !c.reviews) { await dialog({ message: t('clearTestNothing') }); return }
+      const msg = t('clearTestConfirm', { o: c.orders, p: c.points, r: c.ratings, w: c.reviews })
+      if (!await dialog({ message: msg, confirm: true, danger: true, okLabel: t('clearTestButton') })) return
+      if (!await dialog({ message: t('clearTestFinal'), confirm: true, danger: true, okLabel: t('clearTestButton') })) return
+      await api.clearTestData()
+      onCleared()
+      await dialog({ message: t('clearTestDone') })
+    } catch {
+      await dialog({ message: t('error') })
+    } finally { setBusy(false) }
+  }
+
+  return (
+    <div className="card danger-zone">
+      <h2 className="section-title" style={{ marginTop: 0 }}>{t('clearTestTitle')}</h2>
+      <p className="muted">{t('clearTestIntro')}</p>
+      <button type="button" className="btn btn-danger" disabled={busy} onClick={run}>{t('clearTestButton')}</button>
+    </div>
   )
 }

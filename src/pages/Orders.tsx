@@ -5,6 +5,7 @@ import { api, type OrderStatus, type StaffOrder } from '../lib/api'
 import { useI18n, type StringKey } from '../lib/i18n'
 import { pick, rsd } from '../lib/guest'
 import { useLoad } from '../lib/useLoad'
+import { chime, setSoundOn, soundOn } from '../lib/orderAlert'
 
 type Filter = 'active' | 'new' | 'preparing' | 'ready' | 'delivered'
 const FILTERS: Filter[] = ['active', 'new', 'preparing', 'ready', 'delivered']
@@ -36,6 +37,7 @@ export function Orders() {
         <input type="date" value={day} max={localDay()} onChange={e => setDay(e.target.value || localDay())} aria-label={t('today')} />
         {day !== localDay() && <button className="btn btn-ghost btn-small" onClick={() => setDay(localDay())}>{t('today')}</button>}
       </div>
+      <SoundToggle />
       <div className="filters" role="tablist">
         {FILTERS.map(f => (
           <button key={f} role="tab" aria-selected={filter === f} className={filter === f ? 'on' : ''} onClick={() => setFilter(f)}>
@@ -50,6 +52,20 @@ export function Orders() {
         </ul>
       )}
     </Page>
+  )
+}
+
+function SoundToggle() {
+  const { t } = useI18n()
+  const [on, setOn] = useState(soundOn())
+  return (
+    <div className="sound-row">
+      <label className="toggle">
+        <input type="checkbox" checked={on} onChange={e => { setSoundOn(e.target.checked); setOn(e.target.checked); if (e.target.checked) chime() }} />
+        <span>{t('orderSound')}</span>
+      </label>
+      <button type="button" className="link-btn" onClick={chime}>{t('testSound')}</button>
+    </div>
   )
 }
 

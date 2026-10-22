@@ -26,6 +26,7 @@ import { Staff } from './pages/admin/Staff'
 import { RewardsEdit } from './pages/admin/RewardsEdit'
 import { Reviews } from './pages/admin/Reviews'
 import { EventsEdit } from './pages/admin/EventsEdit'
+import { OrderAlerts } from './lib/orderAlert'
 
 
 function AppRoutes() {
@@ -82,6 +83,7 @@ export default function App() {
       <main className="frame">
         <div className="frame-inner"><AppRoutes /></div>
       </main>
+      <OrderAlerts />
     </>
   )
 }

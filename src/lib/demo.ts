@@ -202,6 +202,8 @@ const statsFor = (from: string, to: string) => {
   }
 }
 
+const demoCounts = () => ({ orders: staffOrders.length, points: staffOrders.length ? 42 : 0, ratings: staffOrders.length ? 9 : 0, reviews: reviews.length })
+
 const admin = {
   async stats(from: string, to: string) { await sleep(); return statsFor(from, to) },
   async people(query: string, staffOnly: boolean) {
@@ -236,6 +238,19 @@ const admin = {
   },
   async eventAudience(days: number) { return days >= 60 ? 37 : 24 },
   async changeNickname(n: string) { profile.nickname = n; profile.warned_until = null },
+  async testDataCounts() { return demoCounts() },
+  async clearTestData() {
+    const before = demoCounts()
+    staffOrders.splice(0); reviews.splice(0); order = null
+    return before
+  },
+  // Add ?ping to the address to hear the new-order alert a few seconds after the page opens.
+  watchNewOrders(onNew: (orderId: string, confirmedBy: string | null) => void) {
+    if (!new URLSearchParams(window.location.search).has('ping') && !sessionStorage.getItem('padrino.ping')) return () => {}
+    sessionStorage.setItem('padrino.ping', '1')
+    const i = setInterval(() => onNew(`demo-${Date.now()}`, null), 8000)
+    return () => clearInterval(i)
+  },
 } satisfies Partial<Api>
 
 const demoApi: Api = { ...base, ...admin }
