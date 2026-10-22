@@ -79,7 +79,8 @@ const strings = {
   role_guest: { sr: 'Član Porodice', en: 'Family member' },
   role_waiter: { sr: 'Konobar', en: 'Waiter' },
   role_admin: { sr: 'Admin', en: 'Admin' },
-  role_owner: { sr: 'Vlasnik', en: 'Owner' },
+  // The owner is labelled Administrator rather than Owner; the account keeps every owner privilege.
+  role_owner: { sr: 'Administrator', en: 'Administrator' },
 
   unavailable: { sr: 'Trenutno nema', en: 'Not available now' },
   ratings: { sr: 'ocena', en: 'ratings' },

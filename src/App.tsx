@@ -64,7 +64,7 @@ function AppRoutes() {
       <Route path="/scan" element={<RoleGate min="waiter"><Scan /></RoleGate>} />
       <Route path="/orders" element={<RoleGate min="waiter"><Orders /></RoleGate>} />
       <Route path="/redeem" element={<RoleGate min="waiter"><Redeem /></RoleGate>} />
-      <Route path="/admin/menu" element={<RoleGate min="waiter"><MenuEdit /></RoleGate>} />
+      <Route path="/admin/menu" element={<RoleGate min="admin"><MenuEdit /></RoleGate>} />
       <Route path="/admin/stats" element={<RoleGate min="admin"><Stats /></RoleGate>} />
       <Route path="/admin/staff" element={<RoleGate min="admin"><Staff /></RoleGate>} />
       <Route path="/admin/rewards" element={<RoleGate min="admin"><RewardsEdit /></RoleGate>} />
