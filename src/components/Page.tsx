@@ -1,7 +1,6 @@
 import type { ReactNode } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useI18n } from '../lib/i18n'
-import { Cz } from './Cz'
 
 export function Page({ title, back = true, children }: { title?: string; back?: boolean; children: ReactNode }) {
   const navigate = useNavigate()
@@ -11,7 +10,7 @@ export function Page({ title, back = true, children }: { title?: string; back?: 
   return (
     <div className="page">
       {back && <button className="back" onClick={goBack} aria-label={t('back')}>‹ {t('back')}</button>}
-      {title && <h1 className="title"><Cz>{title}</Cz></h1>}
+      {title && <h1 className="title">{title}</h1>}
       {children}
     </div>
   )

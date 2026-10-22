@@ -1,6 +1,5 @@
 import { Link } from 'react-router-dom'
 import { Logo } from '../components/Logo'
-import { Cz } from '../components/Cz'
 import { useI18n, type StringKey } from '../lib/i18n'
 import { isManager, isStaff, useAuth } from '../lib/auth'
 import { supabase } from '../lib/supabase'
@@ -17,7 +16,7 @@ export function Home() {
 
   const Tiles = ({ items, guest }: { items: { to: string; label: StringKey }[]; guest?: boolean }) => (
     <div className={guest ? 'tiles tiles-guest' : 'tiles'}>
-      {items.map(i => <Link key={i.to} to={i.to} className="tile"><Cz>{t(i.label)}</Cz></Link>)}
+      {items.map(i => <Link key={i.to} to={i.to} className="tile">{t(i.label)}</Link>)}
     </div>
   )
 
@@ -32,11 +31,11 @@ export function Home() {
       {isStaff(role) ? (
         <>
           <Link to="/scan" className="btn btn-big" style={{ marginTop: 24 }}>{t('scanOrder')}</Link>
-          <h2 className="group-title"><Cz>{t('everyDay')}</Cz></h2>
+          <h2 className="group-title">{t('everyDay')}</h2>
           <Tiles items={[tile('/orders', 'orders'), tile('/redeem', 'redeem'), tile('/menu', 'menu'), tile('/events', 'events')]} />
           {isManager(role) && (
             <>
-              <h2 className="group-title"><Cz>{t('management')}</Cz></h2>
+              <h2 className="group-title">{t('management')}</h2>
               <Tiles items={[
                 tile('/admin/stats', 'statistics'), tile('/admin/staff', 'staff'), tile('/admin/menu', 'editMenu'),
                 tile('/admin/rewards', 'editRewards'), tile('/admin/reviews', 'waiterReviews'), tile('/admin/events', 'editEvents'),

@@ -1,6 +1,5 @@
 import { useState, type FormEvent } from 'react'
 import { Page } from '../../components/Page'
-import { Cz } from '../../components/Cz'
 import { Field } from '../../components/Field'
 import { Loading } from '../../components/Loading'
 import { Sheet } from '../../components/Sheet'
@@ -42,7 +41,7 @@ export function EventsEdit() {
             return (
               <li key={e.id} className={`card ${past ? 'is-past' : ''}`}>
                 <div className="edit-row-main">
-                  <strong className="event-title"><Cz>{pick(e, 'title', lang)}</Cz></strong>
+                  <strong className="event-title">{pick(e, 'title', lang)}</strong>
                   {past && <span className="tag">{t('pastEvent')}</span>}
                 </div>
                 <p className="muted event-when">{srDate(e.date)} · {e.time.slice(0, 5)}</p>
@@ -84,7 +83,7 @@ function EventForm({ row, onClose, onSave }: { row: Partial<EventItem>; onClose:
   return (
     <Sheet onClose={onClose} label={row.id ? t('edit') : t('newEvent')}>
       <form onSubmit={submit}>
-        <h2 className="section-title" style={{ marginTop: 0 }}><Cz>{row.id ? t('edit') : t('newEvent')}</Cz></h2>
+        <h2 className="section-title" style={{ marginTop: 0 }}>{row.id ? t('edit') : t('newEvent')}</h2>
         <Field label={t('titleSr')} name="title_sr" required value={f.title_sr} onChange={e => set('title_sr')(e.target.value)} />
         <Field label={t('titleEn')} name="title_en" required value={f.title_en} onChange={e => set('title_en')(e.target.value)} />
         <label className="field">

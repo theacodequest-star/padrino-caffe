@@ -1,6 +1,5 @@
 import { useState, type FormEvent } from 'react'
 import { Page } from '../../components/Page'
-import { Cz } from '../../components/Cz'
 import { Field } from '../../components/Field'
 import { Loading } from '../../components/Loading'
 import { Sheet } from '../../components/Sheet'
@@ -65,7 +64,7 @@ function RewardForm({ row, onClose, onSave }: { row: Partial<Reward>; onClose: (
   return (
     <Sheet onClose={onClose} label={row.id ? t('edit') : t('newReward')}>
       <form onSubmit={submit}>
-        <h2 className="section-title" style={{ marginTop: 0 }}><Cz>{row.id ? t('edit') : t('newReward')}</Cz></h2>
+        <h2 className="section-title" style={{ marginTop: 0 }}>{row.id ? t('edit') : t('newReward')}</h2>
         <Field label={t('nameSr')} name="name_sr" required value={f.name_sr} onChange={e => setF({ ...f, name_sr: e.target.value })} />
         <Field label={t('nameEn')} name="name_en" required value={f.name_en} onChange={e => setF({ ...f, name_en: e.target.value })} />
         <Field label={t('costPoints')} name="cost" required inputMode="numeric" value={f.cost} onChange={e => setF({ ...f, cost: e.target.value.replace(/\D/g, '') })} />

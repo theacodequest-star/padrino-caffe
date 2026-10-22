@@ -35,8 +35,8 @@ export function Redeem() {
     if (!ok) return
     setBusy(true)
     try {
-      await api.redeemReward(member.user_id, r.id)
-      setMember({ ...member, balance: member.balance - r.cost })
+      const balance = await api.redeemReward(member.user_id, r.id)
+      setMember({ ...member, balance: typeof balance === 'number' ? balance : member.balance - r.cost })
       setMsg({ text: t('redeemed'), kind: 'ok' })
     } catch { setMsg({ text: t('error'), kind: 'error' }) }
     setBusy(false)

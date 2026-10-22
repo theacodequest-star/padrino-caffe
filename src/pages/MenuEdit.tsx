@@ -1,6 +1,5 @@
 import { useState, type FormEvent } from 'react'
 import { Page } from '../components/Page'
-import { Cz } from '../components/Cz'
 import { Field } from '../components/Field'
 import { Loading } from '../components/Loading'
 import { Sheet } from '../components/Sheet'
@@ -44,7 +43,7 @@ export function MenuEdit() {
       {categories.map(c => (
         <section key={c.id} className="edit-cat">
           <div className="edit-cat-head">
-            <h2 className="section-title"><Cz>{pick(c, 'name', lang)}</Cz></h2>
+            <h2 className="section-title">{pick(c, 'name', lang)}</h2>
             <div className="row-actions">
               <button className="link-btn" onClick={() => setEditing({ kind: 'category', row: c })}>{t('edit')}</button>
               <button className="link-btn danger" onClick={() => removeCategory(c)}>{t('delete')}</button>
@@ -96,7 +95,7 @@ function CategoryForm({ row, onClose, onSave }: { row: Partial<Category>; onClos
   return (
     <Sheet onClose={onClose} label={row.id ? t('edit') : t('newCategory')}>
       <form onSubmit={submit}>
-        <h2 className="section-title" style={{ marginTop: 0 }}><Cz>{row.id ? t('edit') : t('newCategory')}</Cz></h2>
+        <h2 className="section-title" style={{ marginTop: 0 }}>{row.id ? t('edit') : t('newCategory')}</h2>
         <Field label={t('nameSr')} name="name_sr" required value={f.name_sr} onChange={e => setF({ ...f, name_sr: e.target.value })} />
         <Field label={t('nameEn')} name="name_en" required value={f.name_en} onChange={e => setF({ ...f, name_en: e.target.value })} />
         <Field label={t('sortOrder')} name="sort_order" inputMode="numeric" value={f.sort_order} onChange={e => setF({ ...f, sort_order: e.target.value.replace(/\D/g, '') })} />
@@ -131,7 +130,7 @@ function ItemForm({ row, categories, onClose, onSave }: {
   return (
     <Sheet onClose={onClose} label={row.id ? t('edit') : t('newItem')}>
       <form onSubmit={submit}>
-        <h2 className="section-title" style={{ marginTop: 0 }}><Cz>{row.id ? t('edit') : t('newItem')}</Cz></h2>
+        <h2 className="section-title" style={{ marginTop: 0 }}>{row.id ? t('edit') : t('newItem')}</h2>
         <label className="field">
           <span className="field-label">{t('category')}</span>
           <select value={f.category_id} onChange={e => set('category_id')(e.target.value)}>

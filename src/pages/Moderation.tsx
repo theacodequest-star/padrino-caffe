@@ -1,6 +1,5 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import { Page } from '../components/Page'
-import { Cz } from '../components/Cz'
 import { Logo } from '../components/Logo'
 import { NicknameField, type NickState } from './NicknameField'
 import { api } from '../lib/api'
@@ -48,7 +47,7 @@ export function Warned() {
         <p className="alert-risk">{t('warnedRisk')}</p>
       </div>
       <form onSubmit={submit}>
-        <NicknameField value={nickname} onChange={setNickname} onState={setNick} selfId={undefined} />
+        <NicknameField value={nickname} onChange={setNickname} onState={setNick} />
         {error && <p className="form-error">{error}</p>}
         <button className="btn btn-big" disabled={busy || nick !== 'free'}>{t('changeNick')}</button>
       </form>
@@ -62,7 +61,7 @@ export function Banned() {
   return (
     <Page back={false}>
       <div className="home-head" style={{ marginTop: 12 }}><Logo /></div>
-      <h1 className="title" style={{ color: 'var(--danger)' }}><Cz>{t('bannedTitle')}</Cz></h1>
+      <h1 className="title" style={{ color: 'var(--danger)' }}>{t('bannedTitle')}</h1>
       <div className="alert-card ban"><p>{t('bannedText')}</p></div>
       <div className="logout"><button onClick={() => supabase.auth.signOut()}>{t('logout')}</button></div>
     </Page>

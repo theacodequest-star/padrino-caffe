@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { Page } from '../../components/Page'
-import { Cz } from '../../components/Cz'
 import { Loading } from '../../components/Loading'
 import { api } from '../../lib/api'
 import { useI18n, type StringKey } from '../../lib/i18n'
@@ -68,11 +67,11 @@ export function Stats() {
           <BarChart
             title={t('ordersByHour')}
             note={busiest && busiest.hour >= 0 ? t('busiestHour', { h: `${busiest.hour}:00–${busiest.hour + 1}:00` }) : undefined}
-            data={stats.data.by_hour.map(h => ({ key: String(h.hour), label: `${h.hour}h`, value: h.orders, display: String(h.orders) }))}
+            data={stats.data.by_hour.map(h => ({ key: String(h.hour), label: `${h.hour}h`, axis: String(h.hour), value: h.orders, display: String(h.orders) }))}
             highlight={busiest ? String(busiest.hour) : undefined}
           />
 
-          <h2 className="section-title"><Cz>{t('topSelling')}</Cz></h2>
+          <h2 className="section-title">{t('topSelling')}</h2>
           {stats.data.top_selling.length === 0 ? <p className="muted">{t('noData')}</p> : (
             <ol className="rank-list">
               {stats.data.top_selling.map(i => (
@@ -84,7 +83,7 @@ export function Stats() {
               ))}
             </ol>
           )}
-          <h2 className="section-title"><Cz>{t('topRated')}</Cz></h2>
+          <h2 className="section-title">{t('topRated')}</h2>
           {stats.data.top_rated.length === 0 ? <p className="muted">{t('noData')}</p> : (
             <ol className="rank-list">
               {stats.data.top_rated.map(i => (
@@ -102,17 +101,19 @@ export function Stats() {
   )
 }
 
-type Bar = { key: string; label: string; value: number; display: string }
+type Bar = { key: string; label: string; axis?: string; value: number; display: string }
 
 // Up to a month is shown day by day; longer periods are summed per week so columns stay tappable on a phone.
 function dayBars(days: { day: string; revenue: number }[], locale: string): Bar[] {
   const short = (d: string) => new Date(`${d}T00:00:00`).toLocaleDateString(locale, { day: 'numeric', month: 'numeric' })
-  if (days.length <= 31) return days.map(d => ({ key: d.day, label: short(d.day), value: d.revenue, display: rsd(d.revenue) }))
+  // Axis labels stay narrow enough to sit under their column on a 320px phone; the readout shows the full date.
+  const tight = (d: string) => { const [, m, day] = d.split('-').map(Number); return `${day}.${m}.` }
+  if (days.length <= 31) return days.map(d => ({ key: d.day, label: short(d.day), axis: String(Number(d.day.slice(8))), value: d.revenue, display: rsd(d.revenue) }))
   const weeks: Bar[] = []
   for (let i = 0; i < days.length; i += 7) {
     const chunk = days.slice(i, i + 7)
     const sum = chunk.reduce((s, d) => s + d.revenue, 0)
-    weeks.push({ key: chunk[0].day, label: short(chunk[0].day), value: sum, display: `${short(chunk[0].day)}–${short(chunk[chunk.length - 1].day)}: ${rsd(sum)}` })
+    weeks.push({ key: chunk[0].day, label: short(chunk[0].day), axis: tight(chunk[0].day), value: sum, display: `${short(chunk[0].day)}–${short(chunk[chunk.length - 1].day)}: ${rsd(sum)}` })
   }
   return weeks
 }
@@ -123,13 +124,13 @@ function BarChart({ title, note, data, highlight }: { title: string; note?: stri
   const [active, setActive] = useState<string | null>(null)
   const [table, setTable] = useState(false)
   const max = Math.max(1, ...data.map(d => d.value))
-  const labelEvery = Math.ceil(data.length / 7)
+  const labelEvery = Math.ceil(data.length / 6)
   const shown = data.find(d => d.key === active)
 
   return (
     <figure className="card chart">
       <figcaption className="chart-head">
-        <h2 className="section-title"><Cz>{title}</Cz></h2>
+        <h2 className="section-title">{title}</h2>
         <span className="chart-readout" aria-live="polite">{shown ? `${shown.label}: ${shown.display}` : t('tapColumn')}</span>
       </figcaption>
       {note && <p className="chart-note">{note}</p>}
@@ -149,7 +150,7 @@ function BarChart({ title, note, data, highlight }: { title: string; note?: stri
               aria-label={`${d.label}: ${d.display}`}
             >
               <span className="bar" style={{ height: `${Math.max(2, (d.value / max) * 100)}%` }} />
-              <span className="bar-label">{i % labelEvery === 0 ? d.label : ''}</span>
+              <span className="bar-label">{i % labelEvery === 0 ? d.axis ?? d.label : ''}</span>
             </button>
           ))}
         </div>

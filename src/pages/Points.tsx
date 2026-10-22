@@ -1,6 +1,5 @@
 import { Link } from 'react-router-dom'
 import { Page } from '../components/Page'
-import { Cz } from '../components/Cz'
 import { Loading } from '../components/Loading'
 import { Qr } from '../components/Qr'
 import { api } from '../lib/api'
@@ -36,7 +35,7 @@ export function Points() {
       <div className="card rank">
         <div className="rank-head">
           <span className="field-label">{t('rank')}</span>
-          <strong className="rank-name"><Cz>{current.name}</Cz>{title && <> · <Cz>{title}</Cz></>}</strong>
+          <strong className="rank-name">{current.name}{title && <> · {title}</>}</strong>
         </div>
         <div className="progress" role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(progress * 100)}>
           <span style={{ width: `${progress * 100}%` }} />
@@ -45,13 +44,13 @@ export function Points() {
       </div>
 
       <div className="card member">
-        <h2 className="section-title"><Cz>{t('memberCard')}</Cz></h2>
+        <h2 className="section-title">{t('memberCard')}</h2>
         <Qr value={`padrino:member:${profile.id}`} label={t('memberCard')} size={200} />
         <p className="member-nick">{profile.nickname}</p>
         <p className="muted center">{t('memberCardHint')}</p>
       </div>
 
-      <h2 className="section-title"><Cz>{t('rewards')}</Cz></h2>
+      <h2 className="section-title">{t('rewards')}</h2>
       <ul className="list">
         {rewards.map(r => {
           const missing = r.cost - stats.balance
@@ -66,7 +65,7 @@ export function Points() {
         })}
       </ul>
 
-      <h2 className="section-title"><Cz>{`${t('badges')} ${earned.length}/${BADGES.length}`}</Cz></h2>
+      <h2 className="section-title">{`${t('badges')} ${earned.length}/${BADGES.length}`}</h2>
       <ul className="badges">
         {BADGES.map(b => {
           const on = earned.includes(b)
@@ -82,12 +81,12 @@ export function Points() {
 
       <Link to="/leaderboard" className="btn btn-ghost" style={{ marginTop: 20 }}>{t('leaderboard')}</Link>
 
-      <h2 className="section-title"><Cz>{t('history')}</Cz></h2>
+      <h2 className="section-title">{t('history')}</h2>
       {history.length === 0 ? <p className="muted">{t('noHistory')}</p> : (
         <ul className="list">
           {history.map(h => (
             <li key={h.id} className="list-row">
-              <span>{t(`reason_${h.reason}` as StringKey) || h.reason}<br /><span className="muted">{dateFmt.format(new Date(h.created_at))}</span></span>
+              <span>{(lang === 'en' ? h.reward_name_en : h.reward_name_sr) || t(`reason_${h.reason}` as StringKey) || h.reason}<br /><span className="muted">{dateFmt.format(new Date(h.created_at))}</span></span>
               <strong className={h.points > 0 ? 'plus' : 'minus'}>{h.points > 0 ? `+${h.points}` : h.points}</strong>
             </li>
           ))}

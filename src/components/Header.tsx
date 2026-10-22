@@ -1,16 +1,26 @@
 import { Link } from 'react-router-dom'
 import { useI18n } from '../lib/i18n'
 import { useTheme } from '../lib/theme'
+import { useAuth } from '../lib/auth'
+import { supabase } from '../lib/supabase'
+import { demo } from '../lib/demo'
 
 export function Header() {
   const { lang, setLang, t } = useI18n()
   const { theme, toggle } = useTheme()
+  const { session } = useAuth()
+  // Notifications are sent in the language saved on the profile.
+  const switchLang = () => {
+    const next = lang === 'sr' ? 'en' : 'sr'
+    setLang(next)
+    if (session && !demo.on) supabase.from('profiles').update({ language: next }).eq('id', session.user.id).then(() => {})
+  }
   return (
     <header className="header">
       <Link to="/" className="header-brand">CAFFE PADRINO</Link>
       <div className="header-switches">
         <button className="switch" onClick={toggle} aria-label={t('themeToggle')}>{theme === 'dark' ? <Sun /> : <Moon />}</button>
-        <button className="switch" onClick={() => setLang(lang === 'sr' ? 'en' : 'sr')} aria-label={t('langToggle')}>
+        <button className="switch" onClick={switchLang} aria-label={t('langToggle')}>
           {lang === 'sr' ? 'EN' : 'SR'}
         </button>
       </div>

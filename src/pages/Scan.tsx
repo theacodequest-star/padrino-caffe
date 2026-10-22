@@ -1,7 +1,6 @@
 import { useState, type FormEvent } from 'react'
 import { Link } from 'react-router-dom'
 import { Page } from '../components/Page'
-import { Cz } from '../components/Cz'
 import { Scanner } from '../components/Scanner'
 import { api, type Order } from '../lib/api'
 import { useI18n, type StringKey } from '../lib/i18n'
@@ -34,7 +33,7 @@ export function Scan() {
     if (!order) return
     setBusy(true)
     try {
-      await (confirm ? api.confirmOrder(order.id) : api.rejectOrder(order.id))
+      await (confirm ? api.confirmOrder(order) : api.rejectOrder(order))
       setMsg({ text: confirm ? t('confirmed') : t('rejected'), kind: 'ok' })
       setOrder(null); setCode('')
     } catch { setMsg({ text: t('error'), kind: 'error' }) }
@@ -74,7 +73,7 @@ export function Scan() {
         </>
       )}
       {msg && <p className={`scan-msg ${msg.kind}`} role="status">{msg.text}</p>}
-      {msg?.kind === 'ok' && <Link to="/orders" className="btn btn-ghost"><Cz>{t('orders')}</Cz></Link>}
+      {msg?.kind === 'ok' && <Link to="/orders" className="btn btn-ghost">{t('orders')}</Link>}
     </Page>
   )
 }
