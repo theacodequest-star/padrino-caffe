@@ -5,6 +5,7 @@ import { isManager, isStaff, useAuth } from '../lib/auth'
 import { supabase } from '../lib/supabase'
 import { api } from '../lib/api'
 import { useLoad } from '../lib/useLoad'
+import { InstallButton } from '../components/InstallButton'
 
 const tile = (to: string, label: StringKey) => ({ to, label })
 
@@ -51,7 +52,10 @@ export function Home() {
       )}
 
       <p className="footer-quote">„{t('footer')}“</p>
-      <div className="logout"><button onClick={() => supabase.auth.signOut()}>{t('logout')}</button></div>
+      <div className="logout">
+        <InstallButton className="link-btn" />
+        <button onClick={() => supabase.auth.signOut()}>{t('logout')}</button>
+      </div>
     </div>
   )
 }

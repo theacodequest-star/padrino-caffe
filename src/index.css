@@ -243,6 +243,8 @@ form { display: flex; flex-direction: column; gap: 14px; }
 .tile:hover { border-color: var(--gold); }
 .logout { margin-top: auto; padding-top: 28px; text-align: center; }
 .logout button { min-height: 44px; background: none; border: 0; color: var(--muted); font: 15px var(--serif-body); text-decoration: underline; cursor: pointer; }
+.logout .link-btn { display: block; margin: 0 auto 6px; color: var(--gold); }
+.install-steps { margin: 0 0 18px; padding-left: 22px; line-height: 1.7; text-align: left; }
 
 /* In-app dialog */
 .dialog-backdrop {

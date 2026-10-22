@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Logo } from '../components/Logo'
+import { InstallButton } from '../components/InstallButton'
 import { useI18n } from '../lib/i18n'
 import { clearSignedOutElsewhere, wasSignedOutElsewhere } from '../lib/auth'
 
@@ -21,6 +22,7 @@ export function Welcome() {
       <div className="stack">
         <Link to="/signup" className="btn">{t('join')}</Link>
         <Link to="/login" className="btn btn-ghost">{t('login')}</Link>
+        <InstallButton />
       </div>
     </div>
   )
