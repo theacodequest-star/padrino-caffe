@@ -1,3 +1,12 @@
+/* Cinzel, served from the app. Its stock Đ and đ put the bar on top of the letter, so the latin-ext files
+   are patched to cross the stem as Serbian expects (see src/assets/fonts/README.md). */
+@font-face { font-family: 'Cinzel Padrino'; font-weight: 400; font-display: swap; src: url('./assets/fonts/cinzel-latin-ext-400-normal.woff2') format('woff2'); unicode-range: U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF; }
+@font-face { font-family: 'Cinzel Padrino'; font-weight: 400; font-display: swap; src: url('./assets/fonts/cinzel-latin-400-normal.woff2') format('woff2'); unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD; }
+@font-face { font-family: 'Cinzel Padrino'; font-weight: 600; font-display: swap; src: url('./assets/fonts/cinzel-latin-ext-600-normal.woff2') format('woff2'); unicode-range: U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF; }
+@font-face { font-family: 'Cinzel Padrino'; font-weight: 600; font-display: swap; src: url('./assets/fonts/cinzel-latin-600-normal.woff2') format('woff2'); unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD; }
+@font-face { font-family: 'Cinzel Padrino'; font-weight: 700; font-display: swap; src: url('./assets/fonts/cinzel-latin-ext-700-normal.woff2') format('woff2'); unicode-range: U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF; }
+@font-face { font-family: 'Cinzel Padrino'; font-weight: 700; font-display: swap; src: url('./assets/fonts/cinzel-latin-700-normal.woff2') format('woff2'); unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD; }
+
 :root {
   --header-bg: #241A0F;
   --header-fg: #E8C877;
@@ -13,7 +22,7 @@
   --ok: #8FBF6A;
   --line: rgba(201, 164, 76, .35);
   --col: 640px;
-  --serif-title: 'Cinzel', 'Times New Roman', serif;
+  --serif-title: 'Cinzel Padrino', 'Times New Roman', serif;
   --serif-body: 'Playfair Display', Georgia, serif;
   color-scheme: dark;
 }
@@ -258,17 +267,6 @@ form { display: flex; flex-direction: column; gap: 14px; }
 .dialog p { margin: 0 0 18px; }
 .dialog-actions { display: flex; gap: 10px; }
 
-/* Cinzel's Đ puts the bar on top; draw our own across the stem. */
-.dj { position: relative; display: inline-block; }
-.dj::after {
-  content: '';
-  position: absolute;
-  left: -.08em;
-  top: 50%;
-  width: .38em;
-  height: .07em;
-  background: currentColor;
-}
 
 .logo { display: block; height: auto; }
 

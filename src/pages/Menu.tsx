@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Page } from '../components/Page'
-import { Cz } from '../components/Cz'
 import { Loading } from '../components/Loading'
 import { Sheet } from '../components/Sheet'
 import { StarInput, Stars } from '../components/Stars'
@@ -33,7 +32,7 @@ export function Menu() {
 
       {categories.map(c => (
         <section key={c.id} id={`cat-${c.id}`} className="menu-cat">
-          <h2 className="section-title"><Cz>{pick(c, 'name', lang)}</Cz></h2>
+          <h2 className="section-title">{pick(c, 'name', lang)}</h2>
           <ul className="menu-list">
             {items.filter(i => i.category_id === c.id).map(i => {
               const qty = cart[i.id] ?? 0
@@ -102,7 +101,7 @@ function RateSheet({ item, allowed, mine, onClose, onRated }: {
 
   return (
     <Sheet onClose={onClose} label={pick(item, 'name', lang)}>
-      <h2 className="section-title" style={{ marginTop: 0 }}><Cz>{pick(item, 'name', lang)}</Cz></h2>
+      <h2 className="section-title" style={{ marginTop: 0 }}>{pick(item, 'name', lang)}</h2>
       {pick(item, 'description', lang) && <p>{pick(item, 'description', lang)}</p>}
       <p className="menu-item-meta">
         {item.rating_count > 0

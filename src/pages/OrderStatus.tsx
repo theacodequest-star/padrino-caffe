@@ -1,7 +1,6 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { Page } from '../components/Page'
-import { Cz } from '../components/Cz'
 import { Loading } from '../components/Loading'
 import { Qr } from '../components/Qr'
 import { StarInput } from '../components/Stars'
@@ -35,7 +34,7 @@ export function OrderStatus() {
 
   return (
     <Page title={t('yourOrder')}>
-      <div className={`status-pill status-${o.status}`}><Cz>{t(`st_${o.status}` as StringKey)}</Cz></div>
+      <div className={`status-pill status-${o.status}`}>{t(`st_${o.status}` as StringKey)}</div>
 
       {step >= 0 && (
         <ol className="steps" aria-label={t('yourOrder')}>
@@ -129,14 +128,14 @@ function ReviewForm({ order }: { order: Order }) {
 
   return (
     <div className="card">
-      <h2 className="section-title"><Cz>{t('rateDrinks')}</Cz></h2>
+      <h2 className="section-title">{t('rateDrinks')}</h2>
       {order.lines.map(l => (
         <div key={l.item_id} className="rate-row">
           <span>{pick(l, 'name', lang)}</span>
           <StarInput value={drinks[l.item_id] ?? 0} onChange={v => rateDrink(l.item_id, v)} label={pick(l, 'name', lang)} />
         </div>
       ))}
-      <h2 className="section-title"><Cz>{waiter ? t('rateWaiterNamed', { n: waiter }) : t('rateWaiter')}</Cz></h2>
+      <h2 className="section-title">{waiter ? t('rateWaiterNamed', { n: waiter }) : t('rateWaiter')}</h2>
       <form onSubmit={submit}>
         <StarInput value={stars} onChange={setStars} label={t('rateWaiter')} />
         <label className="field">

@@ -1,5 +1,4 @@
 import { Page } from '../components/Page'
-import { Cz } from '../components/Cz'
 import { Loading } from '../components/Loading'
 import { api } from '../lib/api'
 import { useI18n } from '../lib/i18n'
@@ -23,7 +22,7 @@ export function Events() {
                   <span className="event-month">{d.toLocaleDateString(lang === 'sr' ? 'sr-Latn-RS' : 'en-GB', { month: 'short' })}</span>
                 </div>
                 <div>
-                  <h2 className="event-title"><Cz>{pick(e, 'title', lang)}</Cz></h2>
+                  <h2 className="event-title">{pick(e, 'title', lang)}</h2>
                   <p className="muted event-when">
                     {d.toLocaleDateString(lang === 'sr' ? 'sr-Latn-RS' : 'en-GB', { weekday: 'long', day: 'numeric', month: 'numeric', year: 'numeric' })} · {e.time.slice(0, 5)}
                   </p>
