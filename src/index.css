@@ -241,6 +241,14 @@ form { display: flex; flex-direction: column; gap: 14px; }
   text-decoration: none;
 }
 .tile:hover { border-color: var(--gold); }
+.tile { position: relative; }
+.tile-badge { position: absolute; top: 8px; right: 8px; min-width: 22px; height: 22px; padding: 0 6px; border-radius: 999px; background: var(--gold); color: var(--on-gold); font: 700 13px/22px var(--serif-body); letter-spacing: 0; }
+.next-event { display: flex; align-items: center; gap: 14px; margin-bottom: 12px; border: 3px double var(--gold); color: var(--text); text-decoration: none; }
+.next-event:hover { border-color: var(--gold-strong); }
+.next-event-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.next-event-label { font: 600 12px var(--serif-title); letter-spacing: .12em; text-transform: uppercase; color: var(--gold); }
+.next-event .event-title { margin: 0; }
+.next-event-go { font-size: 28px; color: var(--gold); line-height: 1; }
 .logout { margin-top: auto; padding-top: 28px; text-align: center; }
 .logout button { min-height: 44px; background: none; border: 0; color: var(--muted); font: 15px var(--serif-body); text-decoration: underline; cursor: pointer; }
 .logout .link-btn { display: block; margin: 0 auto 6px; color: var(--gold); }
