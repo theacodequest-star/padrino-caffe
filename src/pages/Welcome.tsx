@@ -1,12 +1,15 @@
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Logo } from '../components/Logo'
 import { useI18n } from '../lib/i18n'
-import { signInWithGoogle } from '../lib/auth'
+import { clearSignedOutElsewhere, signInWithGoogle, wasSignedOutElsewhere } from '../lib/auth'
 import { useDialog } from '../components/Dialog'
 
 export function Welcome() {
   const { t } = useI18n()
   const dialog = useDialog()
+  const [kicked] = useState(wasSignedOutElsewhere)
+  useEffect(clearSignedOutElsewhere, [])
   const google = async () => {
     const { error } = await signInWithGoogle()
     if (error) dialog({ message: t('error') })
@@ -20,6 +23,7 @@ export function Welcome() {
         <div className="ornament" aria-hidden="true"><span>◆</span></div>
         <p className="tagline">„{t('tagline')}“</p>
       </div>
+      {kicked && <p className="notice" role="status">{t('signedOutElsewhere')}</p>}
       <div className="stack">
         <Link to="/signup" className="btn">{t('join')}</Link>
         <Link to="/login" className="btn btn-ghost">{t('login')}</Link>

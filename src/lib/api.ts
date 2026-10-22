@@ -66,6 +66,7 @@ export type EventItem = {
   description_en: string | null
   date: string
   time: string
+  announced_at?: string | null
 }
 export type LeaderRow = { nickname: string; points: number; is_me: boolean }
 export type GuestStats = {
@@ -130,6 +131,7 @@ const toEvent = (r: Row): EventItem => {
   return {
     id: String(r.id), title_sr: r.title_sr, title_en: r.title_en, description_sr: r.description_sr || null,
     description_en: r.description_en || null, date: localDate(d), time: `${pad(d.getHours())}:${pad(d.getMinutes())}`,
+    announced_at: r.announced_at ?? null,
   }
 }
 const ORDER_SELECT = '*, order_items(*)'
@@ -349,9 +351,16 @@ const live = {
     check(e.id ? await supabase.from('events').update(row).eq('id', num(e.id)) : await supabase.from('events').insert(row))
   },
   async deleteEvent(id: string) { check(await supabase.from('events').delete().eq('id', num(id))) },
-  // Sends a push notification about the event; returns how many people it went to.
-  async notifyEvent(id: string) {
-    return check<number>(await supabase.rpc('announce_event', { p_event_id: num(id) }))
+  // Queues an email about the event to everyone active in the last `days` days who wants event emails;
+  // returns how many emails were queued. The send-emails function sends them within a few minutes.
+  async notifyEvent(id: string, days: number) {
+    return check<number>(await supabase.rpc('announce_event', { p_event_id: num(id), p_active_days: days }))
+  },
+  async eventAudience(days: number) {
+    return check<number>(await supabase.rpc('event_audience', { p_active_days: days }))
+  },
+  async setEventEmails(on: boolean) {
+    check(await supabase.from('profiles').update({ event_emails: on }).eq('id', await myId()))
   },
   // Only allowed while the account has a nickname warning.
   async changeNickname(nickname: string) {

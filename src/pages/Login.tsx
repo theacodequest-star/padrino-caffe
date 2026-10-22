@@ -4,7 +4,7 @@ import { Page } from '../components/Page'
 import { Field } from '../components/Field'
 import { useI18n } from '../lib/i18n'
 import { supabase } from '../lib/supabase'
-import { signInWithGoogle } from '../lib/auth'
+import { endOtherSessions, signInWithGoogle } from '../lib/auth'
 
 export function Login() {
   const { t } = useI18n()
@@ -18,6 +18,7 @@ export function Login() {
     e.preventDefault()
     setBusy(true); setError('')
     const { error } = await supabase.auth.signInWithPassword({ email: email.trim(), password })
+    if (!error) await endOtherSessions()
     setBusy(false)
     if (error) setError(/banned/i.test(error.message) ? t('bannedEmail') : t('loginFailed'))
     else navigate('/', { replace: true })
